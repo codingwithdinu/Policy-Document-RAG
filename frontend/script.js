@@ -11,7 +11,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   formData.append("file", file);
 
   try {
-    const res = await fetch("http://localhost:8000/upload", { // 🔁 changed from /upload to /uploads
+    const res = await fetch("/upload", {
       method: "POST",
       body: formData,
     });
@@ -35,7 +35,7 @@ document.getElementById("queryForm").addEventListener("submit", async function (
   }
 
   try {
-    const res = await fetch("http://localhost:8000/query", {
+    const res = await fetch("/query", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
