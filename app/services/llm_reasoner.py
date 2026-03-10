@@ -1,13 +1,15 @@
 import os
 import requests
-from groq import Groq
 from app.config import GROQ_API_KEY
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = "llama3-8b-8192"  
+GROQ_MODEL = "llama3-8b-8192"
 
-parse_prompt = open("prompts/parse_query.txt").read()
-decision_prompt = open("prompts/generate_decision.txt").read()
+_PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "prompts")
+
+with open(os.path.join(_PROMPTS_DIR, "parse_query.txt")) as f:
+    parse_prompt = f.read()
+with open(os.path.join(_PROMPTS_DIR, "generate_decision.txt")) as f:
+    decision_prompt = f.read()
 
 def groq_chat(prompt, model="llama3-8b-8192"):
     headers = {

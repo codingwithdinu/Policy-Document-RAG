@@ -2,8 +2,8 @@ services:
   - type: web
     name: llm-insurance-app
     env: python
-    buildCommand: ""
+    buildCommand: "pip install -r requirements.txt"
     startCommand: python run.py
     envVars:
-      - key: GEMINI_API_KEY
-        value: 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
+      - key: GROQ_API_KEY
+        sync: false

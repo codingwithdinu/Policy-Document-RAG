@@ -1,5 +1,3 @@
-from sklearn.feature_extraction.text import CountVectorizer
-
 def chunk_text(text, chunk_size=500, overlap=50):
     words = text.split()
     chunks = []
