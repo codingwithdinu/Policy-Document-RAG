@@ -7,8 +7,7 @@ def get_model():
     return SentenceTransformer(EMBEDDING_MODEL)
 
 def embed_chunks(chunks):
-    if not chunks:
-        return []
+    if not chunks: return []
     return get_model().encode(chunks, normalize_embeddings=True, show_progress_bar=False).tolist()
 
 def embed_query(text):
