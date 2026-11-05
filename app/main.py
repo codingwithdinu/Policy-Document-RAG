@@ -1,44 +1,45 @@
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from app.routes import query, uploads
-import os
 
-app = FastAPI()
+ROOT_DIR = Path(__file__).resolve().parents[1]
+FRONTEND_DIR = ROOT_DIR / "frontend"
 
-# Enable CORS for frontend interaction
+app = FastAPI(
+    title="Policy Document AI",
+    description="Ask evidence-grounded questions about your insurance policy documents.",
+    version="2.0.0",
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this in production
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+app.include_router(query.router, tags=["Questions"])
+app.include_router(uploads.router, tags=["Documents"])
+app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
-# Include all routers
-app.include_router(query.router)
-app.include_router(uploads.router)
+@app.get("/health", tags=["System"])
+def health():
+    return {"status": "ok", "service": "policy-document-ai"}
 
-# Path to the frontend folder
-frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
+@app.get("/")
+async def home():
+    return FileResponse(FRONTEND_DIR / "index.html")
 
-# Serve static assets (CSS/JS/images)
-app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+@app.get("/about")
+async def about():
+    return FileResponse(FRONTEND_DIR / "about.html")
 
-# HTML Routes
-@app.get("/", response_class=HTMLResponse)
-async def serve_home():
-    return FileResponse(os.path.join(frontend_path, "index.html"))
+@app.get("/services")
+async def services():
+    return FileResponse(FRONTEND_DIR / "services.html")
 
-@app.get("/about", response_class=HTMLResponse)
-async def serve_about():
-    return FileResponse(os.path.join(frontend_path, "about.html"))
-
-@app.get("/services", response_class=HTMLResponse)
-async def serve_services():
-    return FileResponse(os.path.join(frontend_path, "services.html"))
-
-@app.get("/contact", response_class=HTMLResponse)
-async def serve_contact():
-    return FileResponse(os.path.join(frontend_path, "contact.html"))
+@app.get("/contact")
+async def contact():
+    return FileResponse(FRONTEND_DIR / "contact.html")
