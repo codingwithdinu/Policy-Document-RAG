@@ -1,0 +1,21 @@
+# Secrets
+.env
+.env.*
+!.env.example
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+# Runtime data
+data/uploads/*
+!data/uploads/.gitkeep
+data/processed/
+vector_store/*
+!vector_store/.gitkeep
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
