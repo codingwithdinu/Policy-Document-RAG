@@ -1,52 +1,19 @@
-// Handle policy document upload
-document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) {
-    alert("Please select a file to upload.");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  try {
-    const res = await fetch("http://localhost:8000/upload", { // 🔁 changed from /upload to /uploads
-      method: "POST",
-      body: formData,
-    });
-
-    const result = await res.json();
-    alert(result.message || "File uploaded successfully.");
-  } catch (err) {
-    console.error("Upload error:", err);
-    alert("Failed to upload file. Please try again.");
-  }
-});
-
-// Handle query submission
-document.getElementById("queryForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const query = document.getElementById("queryInput").value;
-
-  if (!query.trim()) {
-    alert("Please enter a query.");
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:8000/query", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ query: query })
-    });
-
-    const data = await res.json();
-    document.getElementById("responseBox").innerText = data.answer || "No response received.";
-  } catch (err) {
-    console.error("Query error:", err);
-    document.getElementById("responseBox").innerText = "Error while processing the query.";
-  }
-});
+const $ = (selector) => document.querySelector(selector);
+const conversation = $("#conversation"), queryInput = $("#queryInput"), sendButton = $("#sendButton"), uploadStatus = $("#uploadStatus"), fileInput = $("#fileInput"), dropzone = $("#dropzone");
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function showStatus(message,state=""){uploadStatus.textContent=message;uploadStatus.dataset.state=state;}
+function addMessage(role,text,sources=[]){const item=document.createElement("article");item.className="message "+role;const body=document.createElement("div");body.className="message-body";body.textContent=text;item.append(body);if(sources.length){const box=document.createElement("div");box.className="sources";box.innerHTML='<div class="sources-title">↳ EVIDENCE RETRIEVED</div>'+sources.map((s,i)=>'<div class="source-item"><span>'+(i+1)+'</span><div><b>'+escapeHtml(s.source||"Policy document")+'</b><small>'+(s.page?"Page "+escapeHtml(s.page):"Page not available")+' · relevance '+Math.round((s.score||0)*100)+'%</small></div></div>').join("");item.append(box);}conversation.append(item);conversation.scrollTop=conversation.scrollHeight;return item;}
+function setBusy(value){sendButton.disabled=value;sendButton.textContent=value?"…":"↑";queryInput.disabled=value;}
+async function loadDocuments(){try{const r=await fetch("/documents");if(!r.ok)throw Error("Could not load documents");const data=await r.json();$("#docCount").textContent=data.documents.length;const list=$("#documentList");if(!data.documents.length){list.innerHTML='<div class="empty-library">No documents yet.<br>Upload one to get started.</div>';return;}list.innerHTML=data.documents.map(d=>'<div class="document-item"><span class="file-icon">▤</span><div class="document-meta"><b title="'+escapeHtml(d.filename)+'">'+escapeHtml(d.filename)+'</b><small>'+d.indexed_chunks+' indexed chunks · '+(d.size_bytes/1048576).toFixed(1)+' MB</small></div><span class="indexed-dot" title="Indexed"></span></div>').join("");}catch(e){console.error(e);}}
+async function uploadFile(file){if(!file)return;const ext=file.name.split(".").pop().toLowerCase();if(!["pdf","docx","txt"].includes(ext)){showStatus("Please choose a PDF, DOCX, or TXT file.","error");return;}if(file.size>15*1048576){showStatus("File is larger than the 15 MB limit.","error");return;}const form=new FormData();form.append("file",file);showStatus("Uploading and indexing "+file.name+"…","loading");dropzone.classList.add("busy");try{const r=await fetch("/upload",{method:"POST",body:form}),data=await r.json();if(!r.ok)throw Error(data.detail||"Upload failed");showStatus(data.filename+" indexed · "+data.chunks_indexed+" chunks ready","success");addMessage("assistant","Your document is ready. I indexed "+data.chunks_indexed+" text chunks from "+data.filename+". Ask me anything about its policy terms.");await loadDocuments();}catch(e){showStatus(e.message||"Could not upload this document.","error");}finally{dropzone.classList.remove("busy");fileInput.value="";}}
+fileInput.addEventListener("change",()=>uploadFile(fileInput.files[0]));
+["dragenter","dragover"].forEach(name=>dropzone.addEventListener(name,e=>{e.preventDefault();dropzone.classList.add("drag-over");}));
+["dragleave","drop"].forEach(name=>dropzone.addEventListener(name,e=>{e.preventDefault();dropzone.classList.remove("drag-over");}));
+dropzone.addEventListener("drop",e=>uploadFile(e.dataTransfer.files[0]));
+async function askQuestion(question){const clean=question.trim();if(clean.length<3)return;addMessage("user",clean);queryInput.value="";setBusy(true);const pending=addMessage("assistant","Searching your policy and reviewing matching clauses…");pending.classList.add("thinking");try{const r=await fetch("/query",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:clean})}),data=await r.json();if(!r.ok)throw Error(data.detail||"Question could not be processed.");pending.remove();addMessage("assistant",data.answer||"No answer was returned.",data.sources||[]);}catch(e){pending.remove();addMessage("assistant","I couldn't complete that request: "+e.message);}finally{setBusy(false);queryInput.focus();}}
+$("#queryForm").addEventListener("submit",e=>{e.preventDefault();askQuestion(queryInput.value);});
+function bindSuggestions(){const node=$("#suggestions");if(node)node.addEventListener("click",e=>{const button=e.target.closest("button");if(button)askQuestion(button.textContent);});}
+bindSuggestions();
+$("#clearChat").addEventListener("click",()=>{conversation.innerHTML='<div class="welcome-block"><div class="welcome-spark">✳</div><span class="section-kicker">YOUR POLICY, DECODED</span><h3>What would you like<br>to understand?</h3><p>Ask about coverage, exclusions, waiting periods, claim conditions, and more.</p></div><div class="suggestions" id="suggestions"><button class="suggestion">Is hospitalisation covered?</button><button class="suggestion">What are the waiting periods?</button><button class="suggestion">Which treatments are excluded?</button></div>';bindSuggestions();});
+queryInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("#queryForm").requestSubmit();}});
+loadDocuments();
