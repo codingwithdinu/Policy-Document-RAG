@@ -16,7 +16,7 @@ async function readApiResponse(response) {
   if (!raw) throw new Error('Server returned an empty response (HTTP ' + response.status + '). Check backend logs and try again.');
   let data;
   try { data = JSON.parse(raw); }
-  catch { const preview = raw.replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 180); throw new Error('Server returned non-JSON content (HTTP ' + response.status + '). ' + (preview || 'The API may be unavailable or restarting.')); }
+  catch { const preview = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180); throw new Error('Server returned non-JSON content (HTTP ' + response.status + '). ' + (preview || 'The API may be unavailable or restarting.')); }
   if (!response.ok) { const detail = typeof data.detail === 'string' ? data.detail : data.message; throw new Error(detail || ('Request failed (HTTP ' + response.status + ').')); }
   return data;
 }
@@ -61,7 +61,12 @@ async function loadDocuments() {
     list.innerHTML = data.documents.map((doc) => `
       <div class="document-item"><span class="file-icon">▤</span><div class="document-meta"><b title="${escapeHtml(doc.filename)}">${escapeHtml(doc.filename)}</b><small>${doc.indexed_chunks} indexed chunks · ${(doc.size_bytes / 1048576).toFixed(1)} MB</small></div><span class="indexed-dot" title="Indexed"></span></div>
     `).join("");
-  } catch (error) { console.error(error); }
+  } catch (error) {
+    console.error("Could not load document library:", error);
+    const list = $("#documentList");
+    if (list) list.innerHTML = '<div class="empty-library">Could not load documents. Please refresh or check the server.</div>';
+    showStatus(error.message || "Could not connect to the document service.", "error");
+  }
 }
 async function uploadFile(file) {
   if (!file) return;
