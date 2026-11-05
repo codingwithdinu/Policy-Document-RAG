@@ -208,7 +208,9 @@ This is a **single-origin FastAPI service**: backend routes and frontend assets 
 3. Build command: `pip install -r requirements.txt`
 4. Start command: `python run.py`
 5. Add `GROQ_API_KEY` as a secret environment variable in Render.
-6. Deploy and check `/health`, `/`, and `/docs`.
+6. Attach a persistent disk mounted at `/var/data` and set `DATA_DIR=/var/data` in environment variables. This keeps uploaded policies and the FAISS index across restarts and deploys.
+7. Set `GROQ_MODEL` to a model currently available in your Groq account if the default model is unavailable.
+8. Deploy and check `/health`, `/`, and `/docs`.
 
 The server reads the platform-provided `PORT`. Local filesystems on many hosts are ephemeral; use a persistent disk or object storage for durable uploads and index data.
 
