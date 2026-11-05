@@ -124,7 +124,7 @@ Copy `.env.example` to `.env`, then add your own key:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_MODEL=openai/gpt-oss-120b
 EMBEDDING_MODEL=all-MiniLM-L6-v2
 MAX_UPLOAD_MB=15
 ```
@@ -151,7 +151,7 @@ Open **http://localhost:8000**. Interactive API docs: **http://localhost:8000/do
 | Variable | Required | Default | Purpose |
 |---|---:|---|---|
 | `GROQ_API_KEY` | For answers | — | Groq API authentication |
-| `GROQ_MODEL` | No | `llama-3.3-70b-versatile` | Chat model identifier |
+| `GROQ_MODEL` | No | `openai/gpt-oss-120b` | Chat model identifier |
 | `EMBEDDING_MODEL` | No | `all-MiniLM-L6-v2` | Embedding model |
 | `MAX_UPLOAD_MB` | No | `15` | Upload size limit |
 
