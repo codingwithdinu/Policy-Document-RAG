@@ -1,56 +1,44 @@
-import os
 import requests
-from groq import Groq
-from app.config import GROQ_API_KEY
+from app.config import GROQ_API_KEY, GROQ_MODEL
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = "llama3-8b-8192"  
-
-parse_prompt = open("prompts/parse_query.txt").read()
-decision_prompt = open("prompts/generate_decision.txt").read()
-
-def groq_chat(prompt, model="llama3-8b-8192"):
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    body = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}]
-    }
-    res = requests.post("https://api.groq.com/openai/v1/chat/completions", json=body, headers=headers)
-    data = res.json()
-    if "choices" in data:
-        return data["choices"][0]["message"]["content"]
-    return f"Error: {data.get('error', 'No valid response')}"
-    
-def answer_query_with_clauses(query, clauses):
-    joined_clauses = "\n\n".join([f"Clause {i+1}: {clause['text']}" for i, clause in enumerate(clauses[:3])])
-    
-    prompt = f"""
-You are an insurance assistant. Based on the policy clauses provided below, determine whether the given treatment scenario is covered under the insurance policy. 
-
-Always follow these rules:
-- If the treatment or condition falls under a waiting period that hasn't completed (e.g., 2-year waiting for surgeries or pre-existing conditions), respond: "Not Covered."
-- If it’s an accident-related procedure (like ACL tear from injury), it may be covered immediately. Confirm from clauses.
-- If the coverage is clearly mentioned, respond: "Yes, covered because ..." and explain.
-- If the coverage is not mentioned or ambiguous, respond: "Not Covered." and explain.
-- Always include a one-sentence reason after your Yes/No decision.
-
-POLICY CLAUSES:
-{joined_clauses}
-
-QUESTION:
-{query}
-"""
-
-    return groq_chat(prompt)
+def groq_chat(prompt: str) -> str:
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY is not configured. Add it to your environment.")
+    response = requests.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+        json={"model": GROQ_MODEL, "temperature": 0.1, "messages": [
+            {"role": "system", "content": "Answer only from the supplied policy evidence. Never invent policy terms, limits, or eligibility."},
+            {"role": "user", "content": prompt}
+        ]},
+        timeout=45,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    return payload["choices"][0]["message"]["content"].strip()
 
 def parse_query(user_query: str):
-    prompt = parse_prompt.replace("{query}", user_query)
-    return groq_chat(prompt)
+    return user_query.strip()
 
-def generate_decision(parsed_query, retrieved_chunks):
-    context = "\n".join([chunk['text'] for chunk in retrieved_chunks])
-    prompt = decision_prompt.replace("{context}", context).replace("{query}", parsed_query)
+def answer_query_with_clauses(query: str, clauses: list):
+    if not clauses:
+        return "I could not find relevant clauses in the indexed documents. Upload and index the policy document, then ask again."
+    context = "\n\n".join(
+        f"Source: {item.get('source', 'Unknown')} | Page: {item.get('page', 'N/A')} | Clause: {item.get('text', '')}"
+        for item in clauses[:6]
+    )
+    prompt = f"""You are a careful insurance policy document assistant.
+Answer the user's question using only the policy excerpts below.
+- Start with a clear, cautious conclusion: Supported, Not supported, or Insufficient information.
+- Explain the relevant waiting period, exclusions, limits, conditions, or ambiguity only when the evidence says so.
+- Cite source filename and page when available.
+- Do not assume a claim is approved/rejected; explain that final decisions belong to the insurer.
+- If evidence conflicts or is incomplete, say so explicitly.
+
+POLICY EXCERPTS:
+{context}
+
+USER QUESTION:
+{query}
+"""
     return groq_chat(prompt)
