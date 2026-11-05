@@ -35,8 +35,7 @@ def health():
         "service": "policy-document-ai",
         "groq_configured": bool(GROQ_API_KEY),
         "storage_configured": DATA_DIR.exists(),
-        "upload_directory": str(UPLOAD_DIR),
-        "index_directory": str(Path(VECTOR_INDEX_PATH).parent),
+        "persistent_storage_ready": DATA_DIR.exists() and UPLOAD_DIR.exists(),
     }
 
 
