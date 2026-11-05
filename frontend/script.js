@@ -11,6 +11,15 @@ function escapeHtml(value) {
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   })[char]);
 }
+async function readApiResponse(response) {
+  const raw = await response.text();
+  if (!raw) throw new Error('Server returned an empty response (HTTP ' + response.status + '). Check backend logs and try again.');
+  let data;
+  try { data = JSON.parse(raw); }
+  catch { const preview = raw.replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 180); throw new Error('Server returned non-JSON content (HTTP ' + response.status + '). ' + (preview || 'The API may be unavailable or restarting.')); }
+  if (!response.ok) { const detail = typeof data.detail === 'string' ? data.detail : data.message; throw new Error(detail || ('Request failed (HTTP ' + response.status + ').')); }
+  return data;
+}
 function showStatus(message, state = "") {
   uploadStatus.textContent = message;
   uploadStatus.dataset.state = state;
@@ -42,8 +51,7 @@ function setBusy(busy) {
 async function loadDocuments() {
   try {
     const response = await fetch("/documents");
-    if (!response.ok) throw new Error("Could not load documents");
-    const data = await response.json();
+    const data = await readApiResponse(response);
     $("#docCount").textContent = data.documents.length;
     const list = $("#documentList");
     if (!data.documents.length) {
@@ -70,8 +78,7 @@ async function uploadFile(file) {
   dropzone.classList.add("busy");
   try {
     const response = await fetch("/upload", { method: "POST", body: formData });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.detail || "Upload failed");
+    const result = await readApiResponse(response);
     showStatus(`${result.filename} indexed · ${result.chunks_indexed} chunks ready`, "success");
     addMessage("assistant", `Your document is ready. I indexed ${result.chunks_indexed} text chunks from ${result.filename}. Ask me anything about its policy terms.`);
     await loadDocuments();
@@ -105,8 +112,7 @@ async function askQuestion(question) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: clean })
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || "Question could not be processed.");
+    const data = await readApiResponse(response);
     thinking.remove();
     addMessage("assistant", data.answer || "No answer was returned.", data.sources || []);
   } catch (error) {
