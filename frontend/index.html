@@ -1,60 +1,14 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#071b19">
-  <meta name="description" content="Understand insurance policy documents with evidence-grounded AI answers and clause references.">
-  <title>PolicyPilot — Understand every policy</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-  <header class="topbar">
-    <a class="brand" href="/"><span class="brand-mark">P</span><span>policy<span class="brand-light">pilot</span></span></a>
-    <nav class="nav-links"><a class="active" href="/">Workspace</a><a href="/about">How it works</a><a href="/services">Capabilities</a></nav>
-    <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API docs <span>↗</span></a>
-  </header>
-  <main class="shell">
-    <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="pulse"></span> POLICY INTELLIGENCE WORKSPACE</div>
-        <h1>Know what your<br><span>policy actually says.</span></h1>
-        <p>Upload your policy. Ask questions in plain English. Get clear answers grounded in the clauses that matter.</p>
-        <div class="trust-row"><span>✦ Evidence-backed answers</span><span>⌁ Private document workspace</span></div>
-      </div>
-      <div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="shield"><span>✳</span></div><div class="float-card card-top">CLAUSE MATCH <b>98.4%</b></div><div class="float-card card-bottom"><i></i> Sources linked</div></div>
-    </section>
-
-    <section class="workspace">
-      <aside class="side-panel">
-        <div class="panel-heading"><div><span class="section-kicker">YOUR WORKSPACE</span><h2>Policy library</h2></div><span class="count" id="docCount">0</span></div>
-        <label class="dropzone" id="dropzone" for="fileInput">
-          <input id="fileInput" type="file" accept=".pdf,.docx,.txt">
-          <span class="upload-icon">↑</span><strong>Drop a policy here</strong><small>or <u>browse files</u></small>
-          <em>PDF, DOCX, TXT · up to 15 MB</em>
-        </label>
-        <div class="upload-status" id="uploadStatus" role="status" aria-live="polite">Your uploaded policies will appear here.</div>
-        <div class="library-label">INDEXED DOCUMENTS</div>
-        <div class="document-list" id="documentList"><div class="empty-library">No documents yet.<br>Upload one to get started.</div></div>
-        <div class="privacy-note"><span>♧</span><div><b>Your documents, your workspace</b><small>Files are stored by this app instance. Avoid uploading sensitive documents to a public demo.</small></div></div>
-      </aside>
-
-      <section class="chat-panel">
-        <div class="chat-heading"><div class="assistant-avatar">✳</div><div><h2>Policy assistant</h2><p><span class="online-dot"></span> Ready to analyse your documents</p></div><button class="icon-button" id="clearChat" title="Clear conversation" aria-label="Clear conversation">↺</button></div>
-        <div class="conversation" id="conversation" aria-live="polite">
-          <div class="welcome-block"><div class="welcome-spark">✳</div><span class="section-kicker">YOUR POLICY, DECODED</span><h3>What would you like<br>to understand?</h3><p>Ask about coverage, exclusions, waiting periods, claim conditions, and more.</p></div>
-          <div class="suggestions" id="suggestions"><button class="suggestion">Is hospitalisation covered?</button><button class="suggestion">What are the waiting periods?</button><button class="suggestion">Which treatments are excluded?</button></div>
-        </div>
-        <form class="composer" id="queryForm"><textarea id="queryInput" rows="1" placeholder="Ask anything about your policy…" minlength="3" maxlength="2000" required></textarea><div class="composer-bottom"><span>AI can make mistakes. Always verify with your insurer.</span><button class="send-button" id="sendButton" type="submit" aria-label="Send question">↑</button></div></form>
-        <div class="chat-foot"><span>POWERED BY RETRIEVAL-AUGMENTED GENERATION</span><span>Answers include source references</span></div>
-      </section>
-    </section>
-    <footer><span>POLICYPILOT <span class="footer-dot">●</span> BUILT FOR CLARITY</span><span>Not an insurer, broker, or claims approval service.</span></footer>
-  </main>
-  <script src="/static/script.js" defer></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071b19"><meta name="description" content="Understand insurance policy documents with evidence-grounded AI answers and clause references."><title>PolicyPilot — Understand every policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/style.css"></head>
+<body><div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+<header class="topbar"><a class="brand" href="/"><span class="brand-mark">P</span><span>policy<span class="brand-light">pilot</span></span></a><nav class="nav-links"><a class="active" href="/">Workspace</a><a href="/about">How it works</a><a href="/services">Capabilities</a></nav><a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API docs <span>↗</span></a></header>
+<main class="shell"><section class="hero"><div class="hero-copy"><div class="eyebrow"><span class="pulse"></span> POLICY INTELLIGENCE WORKSPACE</div><h1>Know what your<br><span>policy actually says.</span></h1><p>Upload your policy. Ask questions in plain English. Get clear answers grounded in the clauses that matter.</p><div class="trust-row"><span>✦ Evidence-backed answers</span><span>⌁ Private document workspace</span></div></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="shield"><span>✳</span></div><div class="float-card card-top">CLAUSE MATCH <b>RAG SEARCH</b></div><div class="float-card card-bottom"><i></i> Sources linked</div></div></section>
+<section class="workspace"><aside class="side-panel"><div class="panel-heading"><div><span class="section-kicker">YOUR WORKSPACE</span><h2>Policy library</h2></div><span class="count" id="docCount">0</span></div>
+<label class="dropzone" id="dropzone" for="fileInput"><input id="fileInput" type="file" accept=".pdf,.docx,.txt"><span class="upload-icon">↑</span><strong>Drop a policy here</strong><small>or <u>browse files</u></small><em>PDF, DOCX, TXT · up to 15 MB</em></label>
+<div class="upload-status" id="uploadStatus" role="status" aria-live="polite">Your uploaded policies will appear here.</div><div class="library-label">INDEXED DOCUMENTS</div><div class="document-list" id="documentList"><div class="empty-library">No documents yet.<br>Upload one to get started.</div></div>
+<div class="privacy-note"><span>♧</span><div><b>Your documents, your workspace</b><small>Files are stored by this app instance. Avoid uploading sensitive documents to a public demo.</small></div></div></aside>
+<section class="chat-panel"><div class="chat-heading"><div class="assistant-avatar">✳</div><div><h2>Policy assistant</h2><p><span class="online-dot"></span> Ready to analyse your documents</p></div><button class="icon-button" id="clearChat" title="Clear conversation" aria-label="Clear conversation">↺</button></div>
+<div class="conversation" id="conversation" aria-live="polite"><div class="welcome-block"><div class="welcome-spark">✳</div><span class="section-kicker">YOUR POLICY, DECODED</span><h3>What would you like<br>to understand?</h3><p>Ask about coverage, exclusions, waiting periods, claim conditions, and more.</p></div><div class="suggestions" id="suggestions"><button class="suggestion">Is hospitalisation covered?</button><button class="suggestion">What are the waiting periods?</button><button class="suggestion">Which treatments are excluded?</button></div></div>
+<form class="composer" id="queryForm"><textarea id="queryInput" rows="1" placeholder="Ask anything about your policy…" minlength="3" maxlength="2000" required></textarea><div class="composer-bottom"><span>AI can make mistakes. Always verify with your insurer.</span><button class="send-button" id="sendButton" type="submit" aria-label="Send question">↑</button></div></form><div class="chat-foot"><span>POWERED BY RETRIEVAL-AUGMENTED GENERATION</span><span>Answers include source references</span></div></section></section>
+<footer><span>POLICYPILOT <span class="footer-dot">●</span> BUILT FOR CLARITY</span><span>Not an insurer, broker, or claims approval service.</span></footer></main><script src="/static/script.js" defer></script></body></html>
